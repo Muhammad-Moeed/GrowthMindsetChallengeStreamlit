@@ -4,7 +4,6 @@ import random
 import numpy as np
 from PIL import Image
 
-# Custom CSS for Enhanced UI
 st.markdown(
     """
     <style>
@@ -44,19 +43,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# App Title 
 st.title("🚀 Growth Mindset Challenge")
 st.write("\n")
 st.markdown("<div class='card'><h3 style='text-align:center;'>Unlock your potential with this interactive challenge!</h3></div>", unsafe_allow_html=True)
 
-# Personalized Greeting with Typing Effect
 user_name = st.text_input("Enter your name:")
 if user_name:
     with st.spinner("Loading..."):
         time.sleep(1)
     st.success(f"Welcome, **{user_name}**! Let's grow together. 🌱")
 
-# Quiz Section 
 st.header("📝 Growth Mindset Quiz")
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 questions = [
@@ -71,11 +67,10 @@ progress_val = 0
 for i, question in enumerate(questions):
     response = st.radio(question, ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"], key=i)
     responses.append(response)
-    progress_val += 20  # Increment progress per question
+    progress_val += 20 
     st.progress(progress_val / 100)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Score Calculation
 if st.button("Submit Quiz"):
     score = sum([5 if r == "Strongly Agree" else 4 if r == "Agree" else 3 if r == "Neutral" else 2 if r == "Disagree" else 1 for r in responses])
     with st.spinner("Calculating your mindset score..."):
@@ -89,7 +84,6 @@ if st.button("Submit Quiz"):
     ax.axis('equal')
     st.pyplot(fig)
 
-# Daily Growth Challenge 
 st.header("💡 Daily Growth Challenge")
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 challenges = [
@@ -102,7 +96,6 @@ challenges = [
 st.write(f"**Today's Challenge:** {random.choice(challenges)}")
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Gamification: Points & Badges
 st.header("🏆 Gamification")
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 points = st.session_state.get("points", 0)
@@ -115,7 +108,6 @@ if st.button("Complete Challenge"):
         st.success("🎖️ Congrats! You unlocked the **Growth Master** Badge!")
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Inspirational Quotes 
 st.header("📜 Inspirational Quotes")
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 quotes = [
@@ -127,6 +119,5 @@ selected_quote = st.selectbox("Choose a quote:", quotes)
 st.write(f"*{selected_quote}*")
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Footer
 st.markdown("---")
 st.write("Made with ❤️ by Muhammad Moeed")
