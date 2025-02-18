@@ -2,7 +2,6 @@ import streamlit as st
 import time
 import random
 import numpy as np
-import matplotlib.pyplot as plt
 from PIL import Image
 
 # Custom CSS for Enhanced UI
