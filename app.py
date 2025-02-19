@@ -1,123 +1,151 @@
 import streamlit as st
-import time
-import random
-import numpy as np
-from PIL import Image
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import io  
 
-st.markdown(
-    """
-    <style>
-    body {
-        background: linear-gradient(to right, #1E3C72, #2A5298);
+# ****************Page Configuration*******************
+
+st.set_page_config(page_title="📊 Data Visualization Dashboard", layout="wide")
+st.markdown("""
+   <style>
+    .title { 
+        text-align: center; 
+        font-size: 40px !important;  
+        font-weight: bold; 
+        color:rgb(194, 0, 0);  
+        font-family: 'Poppins', sans-serif;  
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);  
+        margin-bottom: 10px;
+    }
+    .subtitle { 
+        text-align: center; 
+        font-size: 20px !important; 
+        color: #AAB7B8;  
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+    .upload-box { 
+        border: 2px dashed #3498DB;  
+        padding: 20px; 
+        border-radius: 10px; 
+        text-align: center; 
+        background-color: #222831;  
         color: white;
-        font-family: 'Poppins', sans-serif;
     }
-    .stApp {
-        background-color: transparent;
-    }
-    .stButton>button {
-        background-color: #FFD700;
-        color: black;
+    .stButton>button { 
+        background-color: #3498DB;  
+        color: white; 
+        font-size: 16px; 
         font-weight: bold;
-        border-radius: 12px;
-        padding: 14px 28px;
-        font-size: 18px;
+        border-radius: 8px; 
+        padding: 12px 24px; 
+        border: none; 
         transition: 0.3s;
     }
-    .stButton>button:hover {
-        background-color: #FFC107;
+    .stButton>button:hover { 
+        background-color: #1A5276;  
     }
-    .card {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+    .stTextInput>div>div>input,
+    .stFileUploader>div>div>button {
+        background-color: #2C3E50;  
+        color: white;
+        border-radius: 5px;
     }
-    .stHeader {
-        color: #FFD700;
-        font-size: 26px;
-        text-align: center;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+</style>
+""", unsafe_allow_html=True)
 
-st.title("🚀 Growth Mindset Challenge")
-st.write("\n")
-st.markdown("<div class='card'><h3 style='text-align:center;'>Unlock your potential with this interactive challenge!</h3></div>", unsafe_allow_html=True)
+st.markdown('<p class="title">📊 Data Visualization Dashboard</p>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Upload your CSV or Excel file to generate interactive charts.</p>', unsafe_allow_html=True)
+st.markdown('<div class="upload-box">📂 Upload your CSV or Excel file</div>', unsafe_allow_html=True)
+uploaded_file = st.file_uploader("", type=["csv", "xlsx"])
 
-user_name = st.text_input("Enter your name:")
-if user_name:
-    with st.spinner("Loading..."):
-        time.sleep(1)
-    st.success(f"Welcome, **{user_name}**! Let's grow together. 🌱")
+if uploaded_file is not None:
+    try:
+        # 📤 File Reading
+        if uploaded_file.name.endswith('.csv'):
+            df = pd.read_csv(uploaded_file)
+        else:
+            df = pd.read_excel(uploaded_file)
+    except Exception as e:
+        st.error(f"Error reading file: {e}")
+    else:
+        st.success("✅ File uploaded successfully!")
+        st.write("### 📄 Data Preview")
+        st.dataframe(df.head())
 
-st.header("📝 Growth Mindset Quiz")
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-questions = [
-    "I believe my intelligence can improve with effort.",
-    "I enjoy challenges and learn from them.",
-    "I see mistakes as opportunities to grow.",
-    "I persist even when tasks are difficult.",
-    "I value feedback and use it to improve."
-]
-responses = []
-progress_val = 0
-for i, question in enumerate(questions):
-    response = st.radio(question, ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"], key=i)
-    responses.append(response)
-    progress_val += 20 
-    st.progress(progress_val / 100)
-st.markdown("</div>", unsafe_allow_html=True)
+        # 🛠 Data Cleaning Options
+        st.write("### 🛠 Data Cleaning Options")
+        if st.checkbox("Remove Duplicates"):
+            df = df.drop_duplicates()
+        if st.checkbox("Remove Missing Values"):
+            df = df.dropna()
 
-if st.button("Submit Quiz"):
-    score = sum([5 if r == "Strongly Agree" else 4 if r == "Agree" else 3 if r == "Neutral" else 2 if r == "Disagree" else 1 for r in responses])
-    with st.spinner("Calculating your mindset score..."):
-        time.sleep(2)
-    st.subheader("🎯 Your Growth Mindset Score:")
-    st.write(f"**{score}/25**")
-    if score > 20:
-        st.balloons()
-    fig, ax = plt.subplots()
-    ax.pie([score, 25 - score], labels=["Growth Mindset", "Remaining"], colors=["#FFD700", "#444444"], autopct='%1.1f%%', startangle=90)
-    ax.axis('equal')
-    st.pyplot(fig)
+        st.write("### 📊 Select Columns for Visualization")
+        selected_columns = st.multiselect("Choose columns", df.columns)
 
-st.header("💡 Daily Growth Challenge")
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-challenges = [
-    "Read 5 pages of a book 📖",
-    "Learn a new word and use it in a sentence 📝",
-    "Take a 10-minute mindful break ☕",
-    "Write down one thing you're grateful for 🙏",
-    "Try a new skill for 15 minutes 🎨"
-]
-st.write(f"**Today's Challenge:** {random.choice(challenges)}")
-st.markdown("</div>", unsafe_allow_html=True)
+        if selected_columns:
+            df_selected = df[selected_columns]
+            df_numeric = df_selected.select_dtypes(include=['number'])
 
-st.header("🏆 Gamification")
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-points = st.session_state.get("points", 0)
-if st.button("Complete Challenge"):
-    points += 10
-    st.session_state.points = points
-    st.success(f"🎉 You earned 10 points! Total Points: {points}")
-    if points >= 50:
-        st.snow()
-        st.success("🎖️ Congrats! You unlocked the **Growth Master** Badge!")
-st.markdown("</div>", unsafe_allow_html=True)
+            st.write("### 📊 Choose Chart Type")
+            chart_type = st.selectbox("Select Chart Type", ["Line Chart", "Bar Chart", "Scatter Plot"])
 
-st.header("📜 Inspirational Quotes")
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-quotes = [
-    "The only limit to our realization of tomorrow is our doubts of today. – Franklin D. Roosevelt",
-    "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill",
-    "You don’t have to be great to start, but you have to start to be great. – Zig Ziglar"
-]
-selected_quote = st.selectbox("Choose a quote:", quotes)
-st.write(f"*{selected_quote}*")
-st.markdown("</div>", unsafe_allow_html=True)
+            if chart_type == "Line Chart":
+                if df_numeric.empty:
+                    st.warning("⚠️ Selected columns do not contain numeric data.")
+                else:
+                    fig = px.line(df_numeric, markers=True, title="📈 Line Chart")  
+                    fig.update_layout(transition_duration=700)
+                    st.plotly_chart(fig, use_container_width=True)
 
-st.markdown("---")
-st.write("Made with ❤️ by Muhammad Moeed")
+            elif chart_type == "Bar Chart":
+                if df_numeric.empty:
+                    st.warning("⚠️ Selected columns do not contain numeric data.")
+                else:
+                    fig = px.bar(df_numeric, barmode="group", title="📊 Bar Chart")
+                    fig.update_layout(transition_duration=700)
+                    st.plotly_chart(fig, use_container_width=True)
+
+            elif chart_type == "Scatter Plot":
+                if len(df_numeric.columns) >= 2:
+                    fig = px.scatter(df_numeric, 
+                                     x=df_numeric.columns[0], 
+                                     y=df_numeric.columns[1], 
+                                     title="🔵 Scatter Plot", 
+                                     color=df_numeric.columns[0], 
+                                     size=df_numeric.columns[1])
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.warning("⚠️ Select at least 2 numeric columns for a scatter plot.")
+
+        st.write("### 🔄 Convert File")
+        output_format = st.selectbox("Select format", ["CSV", "Excel"])
+
+        if st.button("Convert & Download", key="convert_button"):
+            try:
+                if output_format == "CSV":
+                    converted_file = df.to_csv(index=False).encode('utf-8')
+                    st.download_button(
+                        label="📥 Download CSV",
+                        data=converted_file,
+                        file_name="converted_file.csv",
+                        mime="text/csv"
+                    )
+                else:
+                    output = io.BytesIO()
+                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                        df.to_excel(writer, index=False)
+                    output.seek(0)
+
+                    st.download_button(
+                        label="📥 Download Excel",
+                        data=output,
+                        file_name="converted_file.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+                st.success("✅ File converted successfully!")
+            except Exception as e:
+                st.error(f" Error during file conversion: {e}")
+else:
+    st.info("📌 Please upload a file to get started.")
