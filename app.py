@@ -33,24 +33,13 @@ st.markdown("""
         background-color: #222831;  
         color: white;
     }
-    .stButton>button { 
-        background-color: #3498DB;  
-        color: white; 
-        font-size: 16px; 
-        font-weight: bold;
-        border-radius: 8px; 
-        padding: 12px 24px; 
-        border: none; 
-        transition: 0.3s;
-    }
-    .stButton>button:hover { 
-        background-color: #1A5276;  
-    }
-    .stTextInput>div>div>input,
-    .stFileUploader>div>div>button {
-        background-color: #2C3E50;  
-        color: white;
-        border-radius: 5px;
+    .footer { 
+        text-align: center; 
+        font-size: 14px; 
+        color: #AAB7B8; 
+        margin-top: 50px;  
+        padding: 10px;  
+        border-top: 1px solid #555;  
     }
 </style>
 """, unsafe_allow_html=True)
@@ -62,7 +51,8 @@ uploaded_file = st.file_uploader("", type=["csv", "xlsx"])
 
 if uploaded_file is not None:
     try:
-        # 📤 File Reading
+        # File Reading
+
         if uploaded_file.name.endswith('.csv'):
             df = pd.read_csv(uploaded_file)
         else:
@@ -74,13 +64,13 @@ if uploaded_file is not None:
         st.write("### 📄 Data Preview")
         st.dataframe(df.head())
 
-        # 🛠 Data Cleaning Options
+        # Data Cleaning Options
+
         st.write("### 🛠 Data Cleaning Options")
         if st.checkbox("Remove Duplicates"):
             df = df.drop_duplicates()
         if st.checkbox("Remove Missing Values"):
             df = df.dropna()
-
         st.write("### 📊 Select Columns for Visualization")
         selected_columns = st.multiselect("Choose columns", df.columns)
 
@@ -149,3 +139,6 @@ if uploaded_file is not None:
                 st.error(f" Error during file conversion: {e}")
 else:
     st.info("📌 Please upload a file to get started.")
+
+# ********** Footer **********
+st.markdown('<p class="footer">© 2025 Data Visualization Dashboard | Developed by Muhammad Moeed</p>', unsafe_allow_html=True)
